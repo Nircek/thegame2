@@ -8,7 +8,7 @@ android {
     compileSdkVersion 32
     buildToolsVersion "32.0.0"
     defaultConfig {
-        applicationId "com.example.myapplication"
+        applicationId 'io.github.nircek.thegame2'
         //noinspection MinSdkTooLow
         minSdkVersion 7
         //noinspection OldTargetApi

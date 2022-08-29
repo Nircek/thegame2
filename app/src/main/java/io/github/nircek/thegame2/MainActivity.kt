@@ -1,4 +1,4 @@
-package com.example.myapplication
+package io.github.nircek.thegame2
 
 import android.app.Activity
 import android.os.Bundle
