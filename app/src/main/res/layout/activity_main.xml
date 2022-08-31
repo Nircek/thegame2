@@ -1,14 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context="io.github.nircek.thegame2.MainActivity">
 
-    <TextView
+    <io.github.nircek.thegame2.RadarView
+        android:id="@+id/radar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TableLayout
+        android:id="@+id/table"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <io.github.nircek.thegame2.utils.Gap
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/up"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_media_ff" />
+
+            <io.github.nircek.thegame2.utils.Gap
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/left"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_media_previous" />
+
+            <io.github.nircek.thegame2.utils.Gap
+                android:layout_width="48dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/right"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_media_next" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <io.github.nircek.thegame2.utils.Gap
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/down"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_media_pause" />
+
+            <io.github.nircek.thegame2.utils.Gap
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+
+    </TableLayout>
 
 </LinearLayout>

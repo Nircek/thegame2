@@ -4,12 +4,14 @@
     package="io.github.nircek.thegame2">
     <!-- https://stackoverflow.com/a/46181635/6732111 -->
     <application
-        tools:ignore="AllowBackup"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-        <activity android:name="io.github.nircek.thegame2.MainActivity" >
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup">
+        <activity
+            android:name="io.github.nircek.thegame2.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!-- https://stackoverflow.com/a/52934566/6732111 -->
