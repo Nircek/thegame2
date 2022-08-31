@@ -16,6 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    kotlinOptions.useIR = true
     buildTypes {
         release {
             minifyEnabled false
@@ -26,5 +27,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    //noinspection GradleDependency
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
