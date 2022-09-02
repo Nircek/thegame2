@@ -39,6 +39,8 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
     private var _rotation = 0f
     private var _pull = 30f
 
+    private val map = MazeMap(80, 50)
+
     /** make it a square */
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         val squareSize = min(MeasureSpec.getSize(widthSpec), MeasureSpec.getSize(heightSpec))
@@ -62,6 +64,8 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
         )
         path.addCircle(width / 2f, 0f, 200f, Path.Direction.CCW)
         canvas?.drawPath(path, wallPaint)
+        val w = min(width.toFloat() / (map.X + 2), height.toFloat() / (map.Y + 2))
+        canvas?.drawPath(map.draw(w), wallPaint)
     }
 
     private fun rotate(offset: Float) {
