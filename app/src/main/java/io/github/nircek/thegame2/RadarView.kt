@@ -8,14 +8,13 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
-import android.view.animation.LinearInterpolator
 import android.view.animation.RotateAnimation
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.sin
+import kotlin.math.*
+import kotlin.random.Random
 
+@Suppress("DEPRECATION")
 class RadarView(context: Context, attributeSet: AttributeSet? = null) :
     View(context, attributeSet) {
     enum class ACTION {
@@ -26,20 +25,32 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, resources.displayMetrics)
     private val path = Path()
 
-    private val pTurn = PI.toFloat()
-    private val pPullInc = 30f
-    private val pAnimFrames = 3L
-    private val pPossColors = 8
 
+    private val pTurn = 30.toFloat()
+    private val pPush = 0.2f
+    private val pRenderDistance = E.toFloat()
+    private val pAnimFrames = 7L
+    private val pPossColors = 8
+    private val pMargin = 3 * dp
+    private val pSeed: Int? = null
+    private val map = MazeMap(80, 50, if (pSeed == null) Random.Default else Random(pSeed))
+
+    private val curPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = resources.getColor(R.color.colorPrimary)
+        style = Paint.Style.STROKE
+        strokeWidth = 3 * dp
+    }
     private val wallPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.WHITE
+        color = resources.getColor(R.color.colorWalls)
         style = Paint.Style.STROKE
         strokeWidth = dp
     }
-    private var _rotation = 0f
-    private var _pull = 30f
+    private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = resources.getColor(R.color.colorBackground)
+        style = Paint.Style.FILL_AND_STROKE
+    }
 
-    private val map = MazeMap(80, 50)
+    private var _rotation = 0f
 
     /** make it a square */
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
@@ -50,22 +61,35 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+        val side = width.toFloat()
+        fun Path.polarLineTo(d: Float, r: Float) = lineTo(
+            side / 2f - (r * dp / pRenderDistance * sin((_rotation - d) * PI / 180f)).toFloat(),
+            side / 2f - (r * dp / pRenderDistance * cos((_rotation - d) * PI / 180f)).toFloat(),
+        )
+
         path.reset()
-        path.addCircle(
-            width / 2f,
-            height / 2f,
-            min(width, height) / 2f - 4 * dp,
-            Path.Direction.CCW
-        )
-        path.moveTo(width / 2f, height / 2f)
-        path.lineTo(
-            width / 2f - (_pull * sin(_rotation * PI / 180f)).toFloat(),
-            height / 2f - (_pull * cos(_rotation * PI / 180f)).toFloat(),
-        )
-        path.addCircle(width / 2f, 0f, 200f, Path.Direction.CCW)
+        path.moveTo(side / 2, side / 2)
+        path.polarLineTo(0f, 50f)
+        path.polarLineTo(230f, 20f)
+        path.polarLineTo(130f, 20f)
+        path.polarLineTo(0f, 50f)
+        path.polarLineTo(0f, 0f)
+        path.polarLineTo(230f, 20f)
+        path.polarLineTo(130f, 20f)
+        path.polarLineTo(0f, 0f)
+        canvas?.drawPath(path, curPaint)
+
+        path.reset()
+        map.drawOn(path, side, pMargin, pRenderDistance)
         canvas?.drawPath(path, wallPaint)
-        val w = min(width.toFloat() / (map.X + 2), height.toFloat() / (map.Y + 2))
-        canvas?.drawPath(map.draw(w), wallPaint)
+
+        path.reset()
+        path.fillType = Path.FillType.EVEN_ODD
+        path.addCircle(side / 2, side / 2, side / 2 - pMargin, Path.Direction.CCW)
+        path.close()
+        path.addCircle(side / 2, side / 2, side, Path.Direction.CCW)
+        path.close()
+        canvas?.drawPath(path, bgPaint)
     }
 
     private fun rotate(offset: Float) {
@@ -78,7 +102,7 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
             0.5f
         ).apply {
             duration = pAnimFrames * 1000 / 60
-            interpolator = LinearInterpolator()
+            interpolator = AccelerateDecelerateInterpolator()
             fillAfter = true
         }.also { startAnimation(it) }
         _rotation += offset
@@ -89,14 +113,15 @@ class RadarView(context: Context, attributeSet: AttributeSet? = null) :
 
     fun takeAction(action: ACTION) {
         when (action) {
-            ACTION.TURN_LEFT -> rotate(-pTurn)
-            ACTION.TURN_RIGHT -> rotate(pTurn)
+            ACTION.TURN_LEFT -> rotate(pTurn)
+            ACTION.TURN_RIGHT -> rotate(-pTurn)
             ACTION.ACCELERATE -> {
-                _pull += pPullInc; invalidate()
+                map.push(_rotation, pPush)
+                invalidate()
             }
             ACTION.STOP -> {
-                _pull = 0f
                 wallPaint.color = randomColor(pPossColors)
+                curPaint.color = randomColor(2 * pPossColors)
                 invalidate()
             }
         }

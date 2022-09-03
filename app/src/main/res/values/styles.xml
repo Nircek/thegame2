@@ -1,9 +1,11 @@
 <resources><!--
     https://stackoverflow.com/a/18365454/6732111
     https://android.googlesource.com/platform/frameworks/base/+/refs/heads/master/core/res/res/values/themes.xml
---><style name="AppTheme" parent="android:Theme.NoTitleBar">
+-->
+    <style name="AppTheme" parent="android:Theme.NoTitleBar">
         <item name="android:textColorPrimary">@color/colorPrimary</item>
         <item name="android:textColorHighlight">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/colorBackground</item>
     </style>
 
 </resources>

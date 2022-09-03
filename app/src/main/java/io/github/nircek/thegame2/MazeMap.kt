@@ -1,17 +1,18 @@
 package io.github.nircek.thegame2
 
 import android.graphics.Path
+import kotlin.math.*
 import kotlin.random.Random
 
 class MazeMap(
-    val X: Int,
-    val Y: Int,
-    rnd: Random = Random(0)
+    private val X: Int,
+    private val Y: Int,
+    rnd: Random
 ) {
     private val xWalls = Array(Y + 1) { BooleanArray(X) { true } }
     private val yWalls = Array(Y) { BooleanArray(X + 1) { true } }
-    private var x = (0..X).random(rnd)
-    private var y = (0..Y).random(rnd)
+    private var x = (0..X).random(rnd) + .5f
+    private var y = (0..Y).random(rnd) + .5f
 
     init {
         // init ported from https://gist.github.com/Marwyk2003/d370123aa1551630d6f8df083dfc236c
@@ -42,29 +43,33 @@ class MazeMap(
         }
     }
 
-    fun draw(W: Float): Path {
-        val path = Path()
+    fun drawOn(path: Path, side: Float, margin: Float, radius: Float): Path {
+        val u = (side - 2 * margin) / radius / 2
+        path.addCircle(side / 2, side / 2, radius * u, Path.Direction.CCW)
 
-        @Suppress("NAME_SHADOWING")
-        fun Array<BooleanArray>.iterateOverLines(func: (i: Int, j: Int) -> Unit) {
-            for ((i, e) in this.withIndex()) {
-                val i = i + 1
-                for ((j, e) in e.withIndex()) {
-                    if (!e) continue
-                    val j = j + 1
-                    func(i, j)
+        val jb = max((y - radius).toInt(), 0)
+        val je = min((y + radius).toInt(), Y)
+        val ib = max((x - radius).toInt(), 0)
+        val ie = min((x + radius).toInt(), X)
+        for (j in (jb..je)) {
+            for (i in (ib..ie)) {
+                val dj = (j - y) * u + (side - 2 * margin) / 2 + margin
+                val di = (i - x) * u + (side - 2 * margin) / 2 + margin
+                if (i < X && xWalls[j][i]) {
+                    path.moveTo(di, dj)
+                    path.lineTo(di + u, dj)
+                }
+                if (j < Y && yWalls[j][i]) {
+                    path.moveTo(di, dj)
+                    path.lineTo(di, dj + u)
                 }
             }
         }
-
-        xWalls.iterateOverLines { i, j ->
-            path.moveTo(j * W, i * W)
-            path.lineTo((j + 1) * W, i * W)
-        }
-        yWalls.iterateOverLines { i, j ->
-            path.moveTo(j * W, i * W)
-            path.lineTo(j * W, (i + 1) * W)
-        }
         return path
+    }
+
+    fun push(direction: Float, dist: Float) {
+        x -= (dist * sin(direction * PI / 180f)).toFloat()
+        y -= (dist * cos(direction * PI / 180f)).toFloat()
     }
 }
